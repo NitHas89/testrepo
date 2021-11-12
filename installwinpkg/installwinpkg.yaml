@@ -1,0 +1,26 @@
+- name: installing windows pkg
+  hosts: all
+  vars:
+    managed_servers:
+    - new_hostname: control
+      new_hostip: 192.168.122.104
+    - new_hostname: managed1
+      new_hostip: 192.168.122.144
+
+  tasks:
+  - name: installing package
+    win_package:
+      path: \\192.168.122.193\public\7zip.exe
+      state: present
+      product_id: 7-Zip
+      arguments: /S
+    register: result
+  - name: debug the results
+    debug:
+      var: result
+  - name: Add hostEntries
+    win_hosts:
+      state: present
+      canonical_name: "{{ item.new_hostname }}"
+      ip_address: "{{ item.new_hostip }}"
+    loop: "{{ managed_servers }}"
